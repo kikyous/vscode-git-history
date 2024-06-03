@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useDrag } from "@use-gesture/react";
-import { sortedIndex } from "lodash";
+import sortedIndex from "lodash/sortedindex";
 import classNames from "classnames";
 
 import { useVirtual } from "react-virtual";
@@ -62,13 +62,29 @@ const PickableList = <T extends Record<string, any>>(
 		scrollToIndex(locationIndex || 0, { align: "center" });
 	}, [scrollToIndex, locationIndex]);
 
-	const dragBind = useDrag(({ type, xy, target }) => {
+	const dragBind = useDrag(({ type, xy, target, intentional }) => {
 		const [x, y] = xy;
 
 		const existedItems =
-			checkKeyIsPressed("Meta") || checkKeyIsPressed("Control")
+			checkKeyIsPressed("Meta") || checkKeyIsPressed("Control") || checkKeyIsPressed("Shift")
 				? pickedItems
 				: {};
+
+
+		const rangePick = (currentIndex: number) => {
+			for (
+				let index = Math.min(dragStartIndex, currentIndex);
+				index <= Math.max(dragStartIndex, currentIndex);
+				index++
+			) {
+				const id = list![index].slice(0, keyLength);
+				if (!Object.prototype.hasOwnProperty.call(existedItems, id)) {
+					existedItems[id] = index;
+				}
+			}
+			setPickedItems(existedItems);
+		};
+
 		const firstItemIndex = virtualItems[0].index;
 		if (type === "pointerdown") {
 			const scrollContainerEl = scrollContainerRef.current!;
@@ -96,17 +112,28 @@ const PickableList = <T extends Record<string, any>>(
 				dragContainerRef.current?.children || []
 			).map((element) => element.getBoundingClientRect().y);
 
-			const dragStartIndex =
-				firstItemIndex + sortedIndex(realTimeItemYs, y) - 1;
 			setContainerRect(realTimeContainerRect);
 			setItemYs(realTimeItemYs);
-			setDragStartIndex(dragStartIndex);
+			const currentIndex = firstItemIndex + sortedIndex(realTimeItemYs, y) - 1;
 
-			const id = list![dragStartIndex].slice(0, keyLength);
-			setPickedItems({
-				...existedItems,
-				[id]: dragStartIndex,
-			});
+			if (checkKeyIsPressed("Shift")) {
+				rangePick(currentIndex);
+				setDragStartIndex(currentIndex);
+				return;
+			}
+			setDragStartIndex(currentIndex);
+
+			const id = list![currentIndex].slice(0, keyLength);
+
+			if (Object.prototype.hasOwnProperty.call(existedItems, id)) {
+				delete existedItems[id];
+				setPickedItems(existedItems);
+			} else {
+				setPickedItems({
+					...existedItems,
+					[id]: currentIndex,
+				});
+			}
 			return;
 		}
 
@@ -115,13 +142,17 @@ const PickableList = <T extends Record<string, any>>(
 				return;
 			}
 
-			setDragStartIndex(INDEX_PLACEHOLDER);
+			// setDragStartIndex(INDEX_PLACEHOLDER);
 			onPick &&
 				onPick(
 					Object.keys(pickedItems!).sort(
 						(id1, id2) => pickedItems[id1] - pickedItems[id2]
 					)
 				);
+			return;
+		}
+
+		if (!intentional) {
 			return;
 		}
 
@@ -137,19 +168,14 @@ const PickableList = <T extends Record<string, any>>(
 			}
 
 			const currentIndex = firstItemIndex + sortedIndex(itemYs, y) - 1;
-			const currentItems = { ...existedItems };
-			for (
-				let index = Math.min(dragStartIndex, currentIndex);
-				index <= Math.max(dragStartIndex, currentIndex);
-				index++
-			) {
-				const id = list![index].slice(0, keyLength);
-				if (!Object.prototype.hasOwnProperty.call(currentItems, id)) {
-					currentItems[id] = index;
-				}
-			}
-
-			setPickedItems(currentItems);
+			rangePick(currentIndex);
+		}
+	}, {
+		threshold: 3,
+		triggerAllEvents: true,
+		pointer: {
+			touch: true,
+			capture: false
 		}
 	});
 
@@ -166,6 +192,7 @@ const PickableList = <T extends Record<string, any>>(
 					height: `${totalSize}px`,
 					width: "100%",
 					position: "relative",
+					touchAction: "none",
 				}}
 			>
 				{virtualItems.map((virtualRow) => (

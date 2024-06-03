@@ -1,6 +1,6 @@
 import { useDrag } from "@use-gesture/react";
 import { useEffect, useMemo, useState } from "react";
-import { sum } from "lodash";
+import sum from "lodash/sum";
 
 import { IHeader } from "./constants";
 

@@ -9,7 +9,7 @@ import {
 	EventEmitter,
 } from "vscode";
 
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 
 import { TYPES } from "../../../container/types";
 import { GitService } from "../../../git/service";
@@ -35,6 +35,8 @@ import {
 
 import { INPUT_HASH_COMMAND } from "../../../commands/input";
 
+import { ChangeTreeView } from "../../changes/ChangeTreeView";
+
 import { link } from "./link";
 import state from "./state";
 
@@ -48,8 +50,9 @@ export class Source {
 		@inject(TYPES.ExtensionContext) private context: ExtensionContext,
 		private git: GitService,
 		private graph: GitGraph,
-		private ChangeTreeDataProvider: ChangeTreeDataProvider
-	) {}
+		private ChangeTreeDataProvider: ChangeTreeDataProvider,
+		private changeTreeView: ChangeTreeView
+	) { }
 
 	getSwitchSubscriber() {
 		return this.switchSubscriber;
@@ -196,6 +199,7 @@ export class Source {
 			workspace.workspaceFolders![0].uri.path
 		);
 		this.updateTreeView(newFileTree);
+		this.changeTreeView.changesViewer.description = `${refs.length} commits`;
 	}
 
 	@link("promise")

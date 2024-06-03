@@ -9,7 +9,7 @@ import { ChangeTreeDataProvider } from "./ChangeTreeDataProvider";
 
 @injectable()
 export class ChangeTreeView {
-	private changesViewer: TreeView<any>;
+	public changesViewer: TreeView<any>;
 
 	constructor(
 		@inject(TYPES.ExtensionContext) private context: ExtensionContext,
