@@ -14,7 +14,7 @@
 		"flow",
 		"tag"
 	],
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"license": "MIT",
 	"icon": "assets/logo/1x.png",
 	"repository": "https://github.com/raymon-sun/vscode-git-history",
@@ -175,8 +175,6 @@
 		"@vscode/codicons": "^0.0.30",
 		"@vscode/webview-ui-toolkit": "^1.0.0",
 		"classnames": "^2.3.1",
-		"dayjs": "^1.10.7",
-		"iconv-lite-umd": "^0.6.8",
 		"inversify": "^6.0.1",
 		"lodash": "^4.17.21",
 		"react": "^17.0.2",
@@ -186,8 +184,7 @@
 		"reflect-metadata": "^0.1.13",
 		"simple-git": "^2.47.0",
 		"threads": "^1.7.0",
-		"vscode-nls": "^5.0.0",
-		"which": "^2.0.2"
+		"vscode-nls": "^5.0.0"
 	},
 	"prettier": {
 		"trailingComma": "es5",
