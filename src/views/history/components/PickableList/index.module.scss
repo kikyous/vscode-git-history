@@ -18,6 +18,7 @@
 		background-color: var(--vscode-list-activeSelectionBackground);
 		color: var(--vscode-list-activeSelectionForeground);
 		outline: 1px solid var(--vscode-list-focusOutline);
+		z-index: 1;
 	}
 
 	@keyframes blink {
