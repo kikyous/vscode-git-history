@@ -111,9 +111,8 @@ export function getSwitchCommandsDisposable() {
 				...otherRefs,
 			].map(({ type, name, hash }) => ({
 				label: `$(${REF_TYPE_DETAIL_MAP[type]?.icon}) ${name}`,
-				description: `${
-					REF_TYPE_DETAIL_MAP[type]?.descriptionPrefix
-				}${hash.substring(0, 8)}`,
+				description: `${REF_TYPE_DETAIL_MAP[type]?.descriptionPrefix
+					}${hash.substring(0, 8)}`,
 				ref: name,
 			}));
 
@@ -136,9 +135,9 @@ export function getSwitchCommandsDisposable() {
 					return;
 				}
 
-				// retain repo
-				const { repo } = state.logOptions;
-				state.logOptions = { repo, ref };
+				// retain repo, authors and keyword
+				const { repo, authors, keyword } = state.logOptions;
+				state.logOptions = { repo, ref, authors, keyword };
 				source.getCommits(switchSubscriber, state.logOptions);
 				quickPick.dispose();
 			});
