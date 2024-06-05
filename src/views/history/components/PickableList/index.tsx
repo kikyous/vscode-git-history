@@ -7,8 +7,6 @@ import { useVirtual } from "react-virtual";
 
 import { checkScrollBarVisible } from "../../utils/element";
 
-import { useIsKeyPressed } from "./event";
-
 import style from "./index.module.scss";
 
 type Id = string;
@@ -52,7 +50,6 @@ const PickableList = <T extends Record<string, any>>(
 	const [itemYs, setItemYs] = useState<number[]>([]);
 	const [dragStartIndex, setDragStartIndex] =
 		useState<number>(INDEX_PLACEHOLDER);
-	const { checkKeyIsPressed } = useIsKeyPressed();
 
 	useEffect(() => {
 		if (typeof locationIndex !== "number") {
@@ -62,14 +59,10 @@ const PickableList = <T extends Record<string, any>>(
 		scrollToIndex(locationIndex || 0, { align: "center" });
 	}, [scrollToIndex, locationIndex]);
 
-	const dragBind = useDrag(({ type, xy, target, intentional }) => {
+	const dragBind = useDrag(({ type, xy, target, intentional, ctrlKey, metaKey, shiftKey }) => {
 		const [x, y] = xy;
 
-		const existedItems =
-			checkKeyIsPressed("Meta") || checkKeyIsPressed("Control") || checkKeyIsPressed("Shift")
-				? pickedItems
-				: {};
-
+		const existedItems = ctrlKey || metaKey || shiftKey ? pickedItems : {};
 
 		const rangePick = (currentIndex: number) => {
 			for (
@@ -116,7 +109,7 @@ const PickableList = <T extends Record<string, any>>(
 			setItemYs(realTimeItemYs);
 			const currentIndex = firstItemIndex + sortedIndex(realTimeItemYs, y) - 1;
 
-			if (checkKeyIsPressed("Shift")) {
+			if (shiftKey) {
 				rangePick(currentIndex);
 				setDragStartIndex(currentIndex);
 				return;
