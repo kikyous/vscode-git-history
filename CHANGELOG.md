@@ -4,6 +4,18 @@ All notable changes to the "git-history" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 0.2.8
+
+- author filter: fix filter by email, add quick select button in list item
+
+## 0.2.7
+
+- filter: keep filters when switch branch
+
+## 0.2.5
+
+- commits list: cmd/ctrl to reverse selection, shift to range selection
+
 ## 0.2.2
 
 - improve performance
