@@ -1,7 +1,8 @@
 import { Pool, spawn, Worker } from "threads";
 
 import { injectable } from "inversify";
-import simpleGit, { SimpleGit } from "simple-git";
+import { simpleGit, SimpleGit } from 'simple-git';
+
 
 import { EventEmitter, Uri, workspace } from "vscode";
 
