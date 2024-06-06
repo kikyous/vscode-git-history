@@ -22,6 +22,7 @@ export function getFilterCommandsDisposable() {
 			quickPick.title = "Select Authors";
 			quickPick.placeholder = "Search author by name or email";
 			quickPick.canSelectMany = true;
+			quickPick.matchOnDescription = true;
 			quickPick.busy = true;
 			quickPick.buttons = [
 				{
@@ -37,6 +38,8 @@ export function getFilterCommandsDisposable() {
 				}
 			});
 
+			quickPick.onDidHide(() => quickPick.dispose());
+
 			quickPick.show();
 
 			const authorItems =
@@ -45,13 +48,21 @@ export function getFilterCommandsDisposable() {
 						label: name + (isSelf ? " (You)" : ""),
 						description: email,
 						value: `${name} <${email}>`,
-						picked: state.logOptions.authors?.includes(name),
+						buttons: [{
+							iconPath: new ThemeIcon("notebook-stop-edit"),
+							tooltip: "Select this",
+						}]
 					})
 				) || [];
 
 			return new Promise((resolve) => {
 				quickPick.onDidAccept(() => {
 					resolve(quickPick.selectedItems.map(({ value }) => value));
+					quickPick.dispose();
+				});
+
+				quickPick.onDidTriggerItemButton(({ item }) => {
+					resolve([item.value]);
 					quickPick.dispose();
 				});
 
