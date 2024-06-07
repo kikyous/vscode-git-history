@@ -1,5 +1,6 @@
 import {
 	FC,
+	FormEvent,
 	useCallback,
 	useContext,
 	useEffect,
@@ -45,22 +46,24 @@ const CommitsTableInner: FC<{ totalWidth: number }> = ({ totalWidth }) => {
 	);
 
 	const onFilter = useCallback(
-		(prop: string) => {
-			switch (prop) {
-				case "description":
-					channel.filterMessage((batchedCommits: IBatchedCommits) =>
-						setBatchedCommits(batchedCommits)
-					);
-					break;
-				case "author":
-					channel.filterAuthor((batchedCommits: IBatchedCommits) =>
-						setBatchedCommits(batchedCommits)
-					);
-					break;
-			}
+		() => {
+			channel.filterAuthor((batchedCommits: IBatchedCommits) =>
+				setBatchedCommits(batchedCommits)
+			);
 		},
 		[channel, setBatchedCommits]
 	);
+
+	const [keyword, setKeyword] = useState("");
+
+	const onKeywordFilter = (event: FormEvent) => {
+		event.preventDefault();
+		channel.filterMessage(
+			(batchedCommits: IBatchedCommits) =>
+				setBatchedCommits(batchedCommits),
+			keyword
+		);
+	};
 
 	const [locationIndex, setLocationIndex] = useState<number>();
 	const onLocate = useCallback(
@@ -120,8 +123,63 @@ const CommitsTableInner: FC<{ totalWidth: number }> = ({ totalWidth }) => {
 							dragBind,
 						},
 						index
-					) => (
-						<div
+					) => {
+						let content;
+						if (prop === "graph") {
+							content = <VSCodeButton
+								className={style["ref-button"]}
+								data-button
+								appearance="icon"
+								title={`Select Branch/Reference · ${options.ref || "All"
+									}`}
+								aria-label="All"
+								onClick={() => onSelectReference()}
+							>
+								<span className="codicon codicon-git-branch" />
+								<span className={style.text}>
+									{options.ref || "All"}
+								</span>
+							</VSCodeButton>;
+						} else if (prop === "description") {
+							content =
+								<form onSubmit={onKeywordFilter} className={style['desc-filter-form']}>
+									<label className={style.desc}>
+										<span className={`codicon codicon-filter${options.keyword?.length ? "-filled" : ""}`} />
+										<input type="text" value={keyword} placeholder={label} onChange={(e) => setKeyword(e.target.value)} />
+									</label>
+								</form>
+								;
+						} else {
+							content = <>
+								<span>{label}</span>
+								{filterable && (
+									<VSCodeButton
+										appearance="icon"
+										onClick={onFilter}
+									>
+										<span
+											className={`codicon codicon-filter${options[
+												filterLogOption as
+												| "authors"
+												| "keyword"
+											]?.length
+												? "-filled"
+												: ""
+												}`}
+										/>
+									</VSCodeButton>
+								)}
+								{locatable && (
+									<VSCodeButton
+										appearance="icon"
+										onClick={() => onLocate(prop)}
+									>
+										<span className="codicon codicon-search" />
+									</VSCodeButton>
+								)}
+							</>;
+						}
+						return <div
 							key={prop}
 							className={style["header-item"]}
 							style={{
@@ -134,55 +192,14 @@ const CommitsTableInner: FC<{ totalWidth: number }> = ({ totalWidth }) => {
 									className={style.divider}
 								/>
 							)}
-							{prop === "graph" ? (
-								<VSCodeButton
-									className={style["ref-button"]}
-									data-button
-									appearance="icon"
-									title={`Select Branch/Reference · ${options.ref || "All"
-										}`}
-									aria-label="All"
-									onClick={() => onSelectReference()}
-								>
-									<span className="codicon codicon-git-branch" />
-									<span className={style.text}>
-										{options.ref || "All"}
-									</span>
-								</VSCodeButton>
-							) : (
-								<>
-									<span>{label}</span>
-									{filterable && (
-										<VSCodeButton
-											appearance="icon"
-											onClick={() => onFilter(prop)}
-										>
-											<span
-												className={`codicon codicon-filter${options[
-													filterLogOption as
-													| "authors"
-													| "keyword"
-												]?.length
-													? "-filled"
-													: ""
-													}`}
-											/>
-										</VSCodeButton>
-									)}
-									{locatable && (
-										<VSCodeButton
-											appearance="icon"
-											onClick={() => onLocate(prop)}
-										>
-											<span className="codicon codicon-search" />
-										</VSCodeButton>
-									)}
-								</>
-							)}
-						</div>
-					)
+
+							{content}
+
+
+						</div >;
+					}
 				)}
-			</div>
+			</div >
 			<div className={style["commits-area"]}>
 				<PickableList
 					list={commits}

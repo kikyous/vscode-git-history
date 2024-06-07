@@ -30,7 +30,6 @@ import {
 
 import {
 	FILTER_AUTHOR_COMMAND,
-	FILTER_MESSAGE_COMMAND,
 } from "../../../commands/filter";
 
 import { INPUT_HASH_COMMAND } from "../../../commands/input";
@@ -100,10 +99,8 @@ export class Source {
 	}
 
 	@link("subscription")
-	async filterMessage(handler: (batchedCommits: IBatchedCommits) => void) {
-		state.logOptions.keyword = await commands.executeCommand<string>(
-			FILTER_MESSAGE_COMMAND
-		);
+	async filterMessage(handler: (batchedCommits: IBatchedCommits) => void, keyword?: string) {
+		state.logOptions.keyword = keyword;
 		this.getCommits(handler, state.logOptions);
 	}
 

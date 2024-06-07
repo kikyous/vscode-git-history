@@ -6,7 +6,6 @@ import { GitService } from "../git/service";
 import state from "../views/history/data/state";
 
 export const FILTER_AUTHOR_COMMAND = "git-history.history.filter.author";
-export const FILTER_MESSAGE_COMMAND = "git-history.history.filter.message";
 
 export function getFilterCommandsDisposable() {
 	const gitService = container.get(GitService);
@@ -72,20 +71,6 @@ export function getFilterCommandsDisposable() {
 				);
 
 				quickPick.busy = false;
-			});
-		}),
-		commands.registerCommand(FILTER_MESSAGE_COMMAND, async () => {
-			const inputBox = window.createInputBox();
-			inputBox.placeholder = "Input message keywords to filter commits";
-			inputBox.value = state.logOptions.keyword || "";
-
-			return new Promise((resolve) => {
-				inputBox.onDidAccept(() => {
-					resolve(inputBox.value);
-					inputBox.dispose();
-				});
-
-				inputBox.show();
 			});
 		}),
 	];
