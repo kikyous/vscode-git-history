@@ -166,6 +166,7 @@ export class GitService {
 			"-z",
 			...(ref ? [ref] : LOG_TYPE_ARGS),
 			"--author-date-order",
+			"--regexp-ignore-case"
 		];
 
 		if (authors && authors.length) {
@@ -201,7 +202,7 @@ export class GitService {
 		const { repo, ref, authors, keyword } = options || {};
 
 		// TODO: reuse arguments assembly process in getCommits
-		const args = ["rev-list", ...(ref ? [ref] : LOG_TYPE_ARGS), "--count"];
+		const args = ["rev-list", ...(ref ? [ref] : LOG_TYPE_ARGS), "--count", "--regexp-ignore-case"];
 
 		if (authors && authors.length) {
 			args.push(...authors.map((author) => `--author=${author}`));
