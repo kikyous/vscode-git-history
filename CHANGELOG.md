@@ -4,6 +4,10 @@ All notable changes to the "git-history" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 0.3.2
+
+- commit msg filter ignore case
+
 ## 0.3.0
 
 - inline keyword filter input
